@@ -128,6 +128,32 @@ considered to be checked AND successful.
 > if a node in the path is hopped without a conditional check, the remaining path
 > is considered to be solved and the result is true.
 
+#### Multiple paths to same permission
+For the following rules:
+```js
+var rules = [
+    {a: 'editor', can: 'edit posts'},
+    {a: 'user',   can: 'editor', when: function (params, callback) {
+        // business logic check
+    }},
+    {a: 'user',   can: 'edit posts'}
+];
+```
+If you do the following check:
+```js
+rbac.check('user', 'edit posts', function (err, res) {
+    // ...
+});
+```
+Then we have these possible paths:
+```txt
+1] 'user' --> 'edit posts'
+2] 'user' --> 'editor' [conditional] --> 'edit posts'
+```
+Paths are checked in serial order. The shortest path is picked up first (though it might not take the least time if conditional). When the match is
+found, any remaining paths are not checked and the result is returned
+immediately.
+
 ## Testing
 Install dev dependencies and run:
 ```bash

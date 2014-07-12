@@ -1,5 +1,5 @@
 # rbac2
-[![NPM version](https://badge.fury.io/js/rbac2.svg)](http://badge.fury.io/js/rbac2)
+[![NPM version](https://badge.fury.io/js/rbac2.svg)](http://badge.fury.io/js/rbac2) [![Build Status](https://travis-ci.org/ramniquesingh/rbac2.svg?branch=master)](https://travis-ci.org/ramniquesingh/rbac2)
 
 Simple RBAC checker with support for context checks.
 

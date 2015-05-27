@@ -124,9 +124,21 @@ The following path is checked:
 To go from 'admin' to 'user', there is no condition. So the rest of the path is
 considered to be checked AND successful.
 
+If the whole path is needed to be checked, then you can instantiate RBAC with an optional second parameter, checkFullPath, or set it after creating the object. It defaults to false, unless set.
+
+```js
+var RBAC = require('rbac2', true);
+```
+or
+```js
+var RBAC = require('rbac2');
+RBAC.checkFullPath = true;
+```
+
 > **In general**: Paths are traveresed continuously till conditional checks exist;
 > if a node in the path is hopped without a conditional check, the remaining path
 > is considered to be solved and the result is true.
+> If checkFullPath, then the whole path needs to be satisfied until the end.
 
 #### Multiple paths to same permission
 For the following rules:

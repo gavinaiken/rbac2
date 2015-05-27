@@ -145,7 +145,7 @@ function checkPath(path, index, params, checkFullPath, cb) {
             return cb(null, true);
         } else {
             // console.log('\t\t* continue checking path');
-            return checkPath(path, index + 1, params, checkFullPath, cb);
+            return self(path, index + 1, params, checkFullPath, cb);
         }
     } else {
         // test condition associated with current node
@@ -154,7 +154,7 @@ function checkPath(path, index, params, checkFullPath, cb) {
             if (!err && res) {
                 // reached this node, move on to next
                 // console.log('\t\t\t... PASSED');
-                self(path, index + 1, params, cb);
+                self(path, index + 1, params, checkFullPath, cb);
             } else {
                 // console.log('\t\t\t... FAILED. Path discarded');
                 return cb(err, false);

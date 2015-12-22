@@ -1,8 +1,9 @@
 var _     = require('lodash'),
     async = require('async');
 
-function RBAC(rules, getRole) {
+function RBAC(rules, checkFullPath) {
     this.rules = rules;
+    this.checkFullPath = !!checkFullPath;
 }
 RBAC.prototype = {
     'check': function (role, permission, params, cb) {
@@ -36,13 +37,14 @@ RBAC.prototype = {
         // console.log('-----------------')
         // _.each(paths, printPath);
 
+        var checkFullPath = this.checkFullPath;
         // Check each path serially
         async.eachSeries(paths, function (path, cb) {
             // console.log();
             // console.log();
             // console.log('# Testing path:\t' + _.pluck(path, 'value').join(' -> '));
             // console.log('-----------------')
-            checkPath(path, 1, params, function (err, res) {
+            checkPath(path, 1, params, checkFullPath, function (err, res) {
                 if (!err && res) {
                     result = true;
                     return cb(new BreakError('passed'));
@@ -124,7 +126,7 @@ function findPaths(root, permission) {
     return paths;
 }
 
-function checkPath(path, index, params, cb) {
+function checkPath(path, index, params, checkFullPath, cb) {
     if (index >= path.length) {
         // console.log('crossed end of path - WIN');
         // reached end
@@ -136,10 +138,15 @@ function checkPath(path, index, params, cb) {
     // console.log('\t- checking: ' + index + ': ' + node.value);
 
     if (!node.when) {
-        // console.log('\t\t* No testing condition specified - SUCCESS');
-        // no condition to get access to this node,
-        // permission granted
-        return cb(null, true);
+        if (!checkFullPath || !node.children) {
+            // console.log('\t\t* No testing condition specified - SUCCESS');
+            // no condition to get access to this node,
+            // permission granted
+            return cb(null, true);
+        } else {
+            // console.log('\t\t* continue checking path');
+            return self(path, index + 1, params, checkFullPath, cb);
+        }
     } else {
         // test condition associated with current node
         // console.log('\t\t* Running user provided test...');
@@ -147,7 +154,7 @@ function checkPath(path, index, params, cb) {
             if (!err && res) {
                 // reached this node, move on to next
                 // console.log('\t\t\t... PASSED');
-                self(path, index + 1, params, cb);
+                self(path, index + 1, params, checkFullPath, cb);
             } else {
                 // console.log('\t\t\t... FAILED. Path discarded');
                 return cb(err, false);

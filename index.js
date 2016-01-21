@@ -20,11 +20,6 @@ RBAC.prototype = {
             'value'   : role,
             'children': toTree(role, this.rules)
         };
-        // console.log('tree: ');
-        // console.log('-----------------')
-        // printTree(tree);
-        // console.log('(*) conditional')
-        // console.log();
 
         // Find all paths from root to permission
         var paths = findPaths(tree, permission);
@@ -32,18 +27,10 @@ RBAC.prototype = {
         paths = _.sortBy(paths, function (path) {
             return path.length;
         });
-        // console.log();
-        // console.log('paths: ');
-        // console.log('-----------------')
-        // _.each(paths, printPath);
 
         var checkFullPath = this.checkFullPath;
         // Check each path serially
         async.eachSeries(paths, function (path, cb) {
-            // console.log();
-            // console.log();
-            // console.log('# Testing path:\t' + _.pluck(path, 'value').join(' -> '));
-            // console.log('-----------------')
             checkPath(path, 1, params, checkFullPath, function (err, res) {
                 if (!err && res) {
                     result = true;
@@ -66,29 +53,6 @@ function BreakError(msg) {
     Error.apply(this, arguments);
 }
 BreakError.prototype = new Error();
-
-// function printTree(root, depth) {
-//     var self = arguments.callee;
-//     if (typeof depth === 'undefined') {
-//         depth = 0;
-//     }
-
-//     var gap = '';
-//     for (var i = 0; i < depth; i++) {
-//         gap = gap + '\t';
-//     }
-
-//     console.log(gap + '- ' + root.value + (root.when ? '*' : ''));
-//     _.each(root.children, function (child) {
-//         self(child, depth + 1);
-//     });
-// }
-
-// function printPath(path) {
-//     console.log(_.map(path, function(node) {
-//         return node.when ? (node.value + '*') : node.value;
-//     }).join(' --> '));
-// }
 
 function toTree(role, rules) {
     var self = arguments.callee;
@@ -128,35 +92,28 @@ function findPaths(root, permission) {
 
 function checkPath(path, index, params, checkFullPath, cb) {
     if (index >= path.length) {
-        // console.log('crossed end of path - WIN');
         // reached end
         return cb(null, true);
     }
 
     var self = arguments.callee;
     var node = path[index];
-    // console.log('\t- checking: ' + index + ': ' + node.value);
 
     if (!node.when) {
         if (!checkFullPath || !node.children) {
-            // console.log('\t\t* No testing condition specified - SUCCESS');
             // no condition to get access to this node,
             // permission granted
             return cb(null, true);
         } else {
-            // console.log('\t\t* continue checking path');
             return self(path, index + 1, params, checkFullPath, cb);
         }
     } else {
         // test condition associated with current node
-        // console.log('\t\t* Running user provided test...');
         node.when(params, function (err, res) {
             if (!err && res) {
                 // reached this node, move on to next
-                // console.log('\t\t\t... PASSED');
                 self(path, index + 1, params, checkFullPath, cb);
             } else {
-                // console.log('\t\t\t... FAILED. Path discarded');
                 return cb(err, false);
             }
         });

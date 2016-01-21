@@ -32,6 +32,7 @@ describe('RBAC', function () {
                 done();
             });
         });
+
         it('should work with conditional functions - fail case', function (done) {
             rbac.check('user', 'edit article', function (err, res) {
                 if (err) {
@@ -42,6 +43,7 @@ describe('RBAC', function () {
                 done();
             });
         });
+
         it('should work with conditional functions - pass case', function (done) {
             rbac.check('user', 'edit article', {
                 userId: 2

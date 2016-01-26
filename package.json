@@ -4,7 +4,7 @@
   "description": "Simple RBAC checker with support for context checks.",
   "main": "index.js",
   "scripts": {
-    "test": "PATH=$(npm bin):$PATH mocha --recursive tests"
+    "test": "PATH=$(npm bin):$PATH mocha --recursive --full-trace --bail --check-leaks --reporter list tests"
   },
   "keywords": [
     "rbac",
@@ -25,10 +25,10 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "async": "^0.9.0",
-    "lodash": "^2.4.1"
+    "async": "^1.5.2",
+    "lodash": "^4.0.0"
   },
   "devDependencies": {
-    "mocha": "^1.20.1"
+    "mocha": "^2.3.4"
   }
 }

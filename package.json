@@ -1,6 +1,6 @@
 {
   "name": "rbac2",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Simple RBAC checker with support for context checks.",
   "main": "index.js",
   "scripts": {

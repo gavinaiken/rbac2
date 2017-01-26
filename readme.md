@@ -166,6 +166,20 @@ Paths are checked in serial order. The shortest path is picked up first (though 
 found, any remaining paths are not checked and the result is returned
 immediately.
 
+### Caching of rule trees
+If you have a large/complex set of rules with roles inheriting from other roles, generating the tree for the role can take a significant amount of time (tens of milliseconds). To speed up the checks, you can ask rbac to cache the tree for each role once it has been generated, at the expense of slightly more use of memory to hold the cached trees.
+
+To use in-memory caching of the trees, instantiate RBAC with an optional third parameter, cacheTrees, or set it after creating the object. It defaults to false, unless set.
+
+```js
+var RBAC = require('rbac2', false, true);
+```
+or
+```js
+var RBAC = require('rbac2');
+RBAC.cacheTrees = true;
+```
+
 ## Testing
 Install dev dependencies and run:
 ```bash

@@ -1,9 +1,13 @@
 var _     = require('lodash'),
     async = require('async');
 
-function RBAC(rules, checkFullPath) {
+function RBAC(rules, checkFullPath, cacheTrees) {
     this.rules = rules;
     this.checkFullPath = !!checkFullPath;
+    this.cacheTrees = !!cacheTrees;
+    if (this.cacheTrees) {
+        this.trees = {};
+    }
 }
 RBAC.prototype = {
     'check': function (role, permission, params, cb) {
@@ -16,10 +20,7 @@ RBAC.prototype = {
         }
 
         // Create a rbac tree from the current role
-        var tree = {
-            'value'   : role,
-            'children': toTree(role, this.rules)
-        };
+        var tree = this.getTree(role);
 
         // Find all paths from root to permission
         var paths = findPaths(tree, permission);
@@ -46,6 +47,22 @@ RBAC.prototype = {
 
             cb(err, result);
         });
+    },
+    'getTree': function (role) {
+        if (!this.cacheTrees) {
+            return {
+                'value'   : role,
+                'children': toTree(role, this.rules)
+            };
+        }
+        if (this.trees[role]) {
+            return this.trees[role];
+        }
+        this.trees[role] = {
+            'value'   : role,
+            'children': toTree(role, this.rules)
+        };
+        return this.trees[role];
     }
 };
 
